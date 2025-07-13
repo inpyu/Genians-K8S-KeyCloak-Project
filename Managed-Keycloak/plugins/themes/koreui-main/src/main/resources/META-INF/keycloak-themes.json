@@ -1,0 +1,16 @@
+{
+  "themes": [
+    {
+      "name": "koreui",
+      "types": [
+        "login"
+      ]
+    },
+    {
+      "name": "koreui_dark",
+      "types": [
+        "login"
+      ]
+    }
+  ]
+}

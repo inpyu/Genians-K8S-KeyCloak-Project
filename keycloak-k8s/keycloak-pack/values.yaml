@@ -1,0 +1,27 @@
+keycloakPack:
+  keycloakPack:
+    args:
+    - start
+    env:
+      kcHostnameAdminUrl: https://kc.sdev.genians.kr
+      kcHostnameUrl: https://kc.sdev.genians.kr
+      kcHttpsCertificateFile: /etc/certs/tls.crt
+      kcHttpsCertificateKeyFile: /etc/certs/tls.key
+      keycloakAdmin: admin
+      keycloakAdminPassword: admin
+    image:
+      repository: quay.io/keycloak/keycloak
+      tag: 22.0.1
+    imagePullPolicy: Always
+  replicas: 1
+kubernetesClusterDomain: cluster.local
+svc:
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  - name: https
+    port: 8443
+    targetPort: 8443
+  type: ClusterIP
+~                        

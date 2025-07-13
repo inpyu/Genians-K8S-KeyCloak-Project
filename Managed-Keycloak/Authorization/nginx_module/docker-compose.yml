@@ -1,0 +1,45 @@
+version: '3'
+services:
+
+  nginx:
+    container_name: nginx_module
+    image: nginx_module:latest
+    ports:
+      - 30005:80
+    volumes:
+      - ./nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf 
+    #  - ${PWD}/lualib/string.lua: /usr/local/openresty/lualib/resty/string.lua:ro
+    networks:
+      - my_network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak_latest
+    restart: always
+    ports:
+      - 30002:8443
+    volumes:    
+      - ./kcdata:/opt/keycloak/kcdata   
+      - ./data:/opt/keycloak/data
+      - ./custom-providers:/opt/keycloak/providers
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      # - KC_HOSTNAME=localhost
+      # - KC_HOSTNAME_STRICT=false
+      # - KC_HOSTNAME_STRICT_HTTPS=false
+      # - KC_HTTP_ENABLED=true
+      - KC_HTTPS_CERTIFICATE_FILE=/opt/keycloak/kcdata/tls/tls.crt
+      - KC_HTTPS_CERTIFICATE_KEY_FILE=/opt/keycloak/kcdata/tls/tls.key  
+      - KC_HOSTNAME=sdevtest.genians.kr
+      - KC_HOSTNAME_PORT=30002
+    command:
+      # - start-dev
+        - start
+        - --hostname-admin-url=https://sdevtest.genians.kr:30002
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge      

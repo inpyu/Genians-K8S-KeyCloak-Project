@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "keycloak-pack.fullname" . }}-ingress
+  labels:
+  {{- include "keycloak-pack.labels" . | nindent 4 }}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/backend-protocol: https
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: kc.sdev.genians.kr
+    http:
+      paths:
+      - backend:
+          service:
+            name: '{{ include "keycloak-pack.fullname" . }}-svc'
+            port:
+              number: 8443
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - kc.sdev.genians.kr
+    secretName: kc-tls-secret

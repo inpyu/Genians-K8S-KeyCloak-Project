@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "keycloak-pack.fullname" . }}-keycloak-pack
+  labels:
+  {{- include "keycloak-pack.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.keycloakPack.replicas }}
+  selector:
+    matchLabels:
+      app: keycloak-pack
+    {{- include "keycloak-pack.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: keycloak-pack
+      {{- include "keycloak-pack.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - args: {{- toYaml .Values.keycloakPack.keycloakPack.args | nindent 8 }}
+        env:
+        - name: KEYCLOAK_ADMIN
+          value: {{ quote .Values.keycloakPack.keycloakPack.env.keycloakAdmin }}
+        - name: KEYCLOAK_ADMIN_PASSWORD
+          value: {{ quote .Values.keycloakPack.keycloakPack.env.keycloakAdminPassword }}
+        - name: KC_HTTPS_CERTIFICATE_FILE
+          value: {{ quote .Values.keycloakPack.keycloakPack.env.kcHttpsCertificateFile
+            }}
+        - name: KC_HTTPS_CERTIFICATE_KEY_FILE
+          value: {{ quote .Values.keycloakPack.keycloakPack.env.kcHttpsCertificateKeyFile
+            }}
+        - name: KC_HOSTNAME_ADMIN_URL
+          value: {{ quote .Values.keycloakPack.keycloakPack.env.kcHostnameAdminUrl }}
+        - name: KC_HOSTNAME_URL
+          value: {{ quote .Values.keycloakPack.keycloakPack.env.kcHostnameUrl }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.keycloakPack.keycloakPack.image.repository }}:{{ .Values.keycloakPack.keycloakPack.image.tag
+          | default .Chart.AppVersion }}
+        imagePullPolicy: {{ .Values.keycloakPack.keycloakPack.imagePullPolicy }}
+        name: keycloak-pack
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 8443
+          name: https
+        resources: {}
+        volumeMounts:
+        - mountPath: /etc/certs
+          name: certs
+          readOnly: true
+      volumes:
+      - name: certs
+        secret:
+          secretName: tls-secret
